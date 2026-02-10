@@ -1,40 +1,56 @@
 require('dotenv').config();
 const { Sequelize, DataTypes } = require('sequelize');
 const bcrypt = require('bcryptjs');
-const mysql = require('mysql2/promise');
 
-const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD !== undefined ? process.env.DB_PASSWORD : '', // Default empty if not set
-  database: process.env.DB_NAME || 'e_test',
-  port: process.env.DB_PORT || 3306
-};
+let sequelize;
 
-// Function to ensure database exists
-const ensureDatabaseExists = async () => {
-  try {
-    const connection = await mysql.createConnection({
-      host: dbConfig.host,
-      user: dbConfig.user,
-      password: dbConfig.password,
-      port: dbConfig.port
-    });
-    await connection.query(`CREATE DATABASE IF NOT EXISTS \`${dbConfig.database}\`;`);
-    await connection.end();
-    console.log(`Database "${dbConfig.database}" ensured.`);
-  } catch (error) {
-    console.error('Error creating database:', error);
-  }
-};
+// Render sets DATABASE_URL environment variable by default for PostgreSQL
+if (process.env.DATABASE_URL) {
+  sequelize = new Sequelize(process.env.DATABASE_URL, {
+    dialect: 'postgres',
+    logging: false,
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false
+      }
+    }
+  });
+} else {
+  // Local Development (MySQL)
+  const dbConfig = {
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD !== undefined ? process.env.DB_PASSWORD : '',
+    database: process.env.DB_NAME || 'e_test',
+    port: process.env.DB_PORT || 3306
+  };
 
-// Initialize MySQL Database
-const sequelize = new Sequelize(dbConfig.database, dbConfig.user, dbConfig.password, {
-  host: dbConfig.host,
-  port: dbConfig.port,
-  dialect: 'mysql',
-  logging: false
-});
+  sequelize = new Sequelize(dbConfig.database, dbConfig.user, dbConfig.password, {
+    host: dbConfig.host,
+    port: dbConfig.port,
+    dialect: 'mysql',
+    logging: false
+  });
+
+  // Function to ensure database exists (MySQL only)
+  var ensureDatabaseExists = async () => {
+    try {
+      const mysql = require('mysql2/promise');
+      const connection = await mysql.createConnection({
+        host: dbConfig.host,
+        user: dbConfig.user,
+        password: dbConfig.password,
+        port: dbConfig.port
+      });
+      await connection.query(`CREATE DATABASE IF NOT EXISTS \`${dbConfig.database}\`;`);
+      await connection.end();
+      console.log(`Database "${dbConfig.database}" ensured.`);
+    } catch (error) {
+      console.error('Error creating database:', error);
+    }
+  };
+}
 
 // --- Models ---
 
@@ -167,9 +183,11 @@ Mistake.belongsTo(Question, { foreignKey: 'question_id' });
 
 const initDB = async () => {
   try {
-    await ensureDatabaseExists();
+    if (typeof ensureDatabaseExists === 'function') {
+      await ensureDatabaseExists();
+    }
     await sequelize.authenticate();
-    console.log('Connected to MySQL successfully.');
+    console.log('Connected to database successfully.');
 
     await sequelize.sync({ alter: true });
     console.log('Database synced');
