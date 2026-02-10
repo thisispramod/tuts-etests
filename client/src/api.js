@@ -4,7 +4,7 @@ const isLocalhost = window.location.hostname === 'localhost' || window.location.
 const productionURL = 'https://tuts-etest.onrender.com/api';
 
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || (isLocalhost ? 'http://localhost:5005/api' : productionURL),
+    baseURL: import.meta.env.VITE_API_URL || (isLocalhost ? 'https://tuts-etest.onrender.com/api' : productionURL),
 });
 
 // Auto-add token to requests
