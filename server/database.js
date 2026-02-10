@@ -38,6 +38,7 @@ if (process.env.DATABASE_URL && process.env.DATABASE_URL.startsWith('postgres'))
   if (process.env.RENDER) {
     console.log(`Render Environment: Attempting connection to ${dbConfig.host}:${dbConfig.port} as ${dbConfig.user} on DB ${dbConfig.database}`);
   }
+  
 
   if (dbConfig.url) {
     sequelize = new Sequelize(dbConfig.url, {
