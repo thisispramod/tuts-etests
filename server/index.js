@@ -840,9 +840,14 @@ app.get('/api/admin/mistakes/student/:studentId', authenticateToken, isAdmin, as
         res.status(500).json({ error: err.message });
     }
 });
-
-initDB().then(() => {
-    app.listen(PORT, () => {
-        console.log(`Server running on http://localhost:${PORT}`);
+ 
+initDB()
+.then(() => {
+    app.listen(PORT, '0.0.0.0', () => {
+        console.log(`Server running on port ${PORT}`);
     });
+})
+.catch(err => {
+    console.error('Database init failed:', err);
+    process.exit(1);
 });
