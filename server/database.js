@@ -1,11 +1,13 @@
 require('dotenv').config();
 const { Sequelize, DataTypes } = require('sequelize');
 const bcrypt = require('bcryptjs');
+const mysql = require('mysql2/promise');
 
 let sequelize;
 
-// Render sets DATABASE_URL environment variable by default for PostgreSQL
-if (process.env.DATABASE_URL) {
+// Database Configuration
+if (process.env.DATABASE_URL && process.env.DATABASE_URL.startsWith('postgres')) {
+  // Render PostgreSQL
   sequelize = new Sequelize(process.env.DATABASE_URL, {
     dialect: 'postgres',
     logging: false,
@@ -17,37 +19,61 @@ if (process.env.DATABASE_URL) {
     }
   });
 } else {
-  // Local Development (MySQL)
+  // MySQL (Local or Remote)
   const dbConfig = {
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD !== undefined ? process.env.DB_PASSWORD : '',
     database: process.env.DB_NAME || 'e_test',
-    port: process.env.DB_PORT || 3306
+    port: process.env.DB_PORT || 3306,
+    url: process.env.MYSQL_URL
   };
 
-  sequelize = new Sequelize(dbConfig.database, dbConfig.user, dbConfig.password, {
-    host: dbConfig.host,
-    port: dbConfig.port,
-    dialect: 'mysql',
-    logging: false
-  });
+  if (dbConfig.url) {
+    sequelize = new Sequelize(dbConfig.url, {
+      dialect: 'mysql',
+      logging: false,
+      dialectOptions: {
+        ssl: {
+          rejectUnauthorized: false
+        }
+      }
+    });
+  } else {
+    sequelize = new Sequelize(dbConfig.database, dbConfig.user, dbConfig.password, {
+      host: dbConfig.host,
+      port: dbConfig.port,
+      dialect: 'mysql',
+      logging: false,
+      dialectOptions: {
+        ssl: (process.env.DB_SSL === 'true') ? { rejectUnauthorized: false } : undefined
+      }
+    });
+  }
 
-  // Function to ensure database exists (MySQL only)
+  // Function to ensure database exists (Only runs for local development)
   var ensureDatabaseExists = async () => {
+    // Only attempt to create database if we are connecting to localhost and not using a URL
+    if (dbConfig.host !== 'localhost' && dbConfig.host !== '127.0.0.1' && !dbConfig.url) {
+      console.log('Skipping database creation check for remote host.');
+      return;
+    }
+
     try {
       const mysql = require('mysql2/promise');
-      const connection = await mysql.createConnection({
+      const connConfig = dbConfig.url ? dbConfig.url : {
         host: dbConfig.host,
         user: dbConfig.user,
         password: dbConfig.password,
         port: dbConfig.port
-      });
+      };
+
+      const connection = await mysql.createConnection(connConfig);
       await connection.query(`CREATE DATABASE IF NOT EXISTS \`${dbConfig.database}\`;`);
       await connection.end();
       console.log(`Database "${dbConfig.database}" ensured.`);
     } catch (error) {
-      console.error('Error creating database:', error);
+      console.error('Database existence check failed (ignoring):', error.message);
     }
   };
 }
@@ -183,11 +209,9 @@ Mistake.belongsTo(Question, { foreignKey: 'question_id' });
 
 const initDB = async () => {
   try {
-    if (typeof ensureDatabaseExists === 'function') {
-      await ensureDatabaseExists();
-    }
+    await ensureDatabaseExists();
     await sequelize.authenticate();
-    console.log('Connected to database successfully.');
+    console.log('Connected to MySQL successfully.');
 
     await sequelize.sync({ alter: true });
     console.log('Database synced');

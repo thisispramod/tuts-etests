@@ -851,3 +851,8 @@ initDB()
         console.error('Database init failed:', err);
         process.exit(1);
     });
+
+app.use(cors({
+  origin: "https://tuts-etests.vercel.app",
+  credentials: true
+}));
