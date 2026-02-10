@@ -11,8 +11,8 @@ const PORT = process.env.PORT || 5005;
 const SECRET_KEY = process.env.JWT_SECRET || 'super_secret_jwt_key_should_be_in_env'; // Fallback for dev only
 
 const allowedOrigins = [
-    'https://tuts-e-test.vercel.app', // Vite default
-    'https://tuts-e-test.vercel.app/login', // Vite default alternative
+    'http://localhost:5173/login', // Vite default
+    'http://localhost:5174', // Vite default alternative
     process.env.CLIENT_URL // Production URL
 ].filter(Boolean);
 
@@ -840,14 +840,14 @@ app.get('/api/admin/mistakes/student/:studentId', authenticateToken, isAdmin, as
         res.status(500).json({ error: err.message });
     }
 });
- 
+
 initDB()
-.then(() => {
-    app.listen(PORT, '0.0.0.0', () => {
-        console.log(`Server running on port ${PORT}`);
+    .then(() => {
+        app.listen(PORT, '0.0.0.0', () => {
+            console.log(`Server running on port ${PORT}`);
+        });
+    })
+    .catch(err => {
+        console.error('Database init failed:', err);
+        process.exit(1);
     });
-})
-.catch(err => {
-    console.error('Database init failed:', err);
-    process.exit(1);
-});
