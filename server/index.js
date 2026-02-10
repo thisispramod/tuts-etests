@@ -13,9 +13,10 @@ const PORT = process.env.PORT || 5005;
 const SECRET_KEY = process.env.JWT_SECRET || 'super_secret_jwt_key_should_be_in_env'; // Fallback for dev only
 
 const allowedOrigins = [
-    'http://localhost:5173/login', // Vite default
-    'http://localhost:5174', // Vite default alternative
-    process.env.CLIENT_URL // Production URL
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'https://tuts-etests.vercel.app',
+    process.env.CLIENT_URL
 ].filter(Boolean);
 
 app.use(cors({
@@ -23,7 +24,7 @@ app.use(cors({
         if (!origin || allowedOrigins.indexOf(origin) !== -1) {
             callback(null, true);
         } else {
-            // Build this to be permissive in dev if origin is undefined (e.g. Postman), but strict in prod
+            console.log('CORS blocked for origin:', origin);
             callback(new Error('Not allowed by CORS'));
         }
     },
@@ -854,7 +855,3 @@ initDB()
         process.exit(1);
     });
 
-app.use(cors({
-    origin: "https://tuts-etests.vercel.app",
-    credentials: true
-}));
