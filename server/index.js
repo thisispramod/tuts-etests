@@ -1,4 +1,6 @@
-require('dotenv').config();
+if (!process.env.RENDER) {
+    require('dotenv').config();
+}
 const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
@@ -853,6 +855,6 @@ initDB()
     });
 
 app.use(cors({
-  origin: "https://tuts-etests.vercel.app",
-  credentials: true
+    origin: "https://tuts-etests.vercel.app",
+    credentials: true
 }));

@@ -1,4 +1,8 @@
-require('dotenv').config();
+// Only load .env in development. On Render, environment variables are set in the dashboard.
+if (!process.env.RENDER) {
+  require('dotenv').config();
+}
+
 const { Sequelize, DataTypes } = require('sequelize');
 const bcrypt = require('bcryptjs');
 const mysql = require('mysql2/promise');
@@ -8,6 +12,7 @@ let sequelize;
 // Database Configuration
 if (process.env.DATABASE_URL && process.env.DATABASE_URL.startsWith('postgres')) {
   // Render PostgreSQL
+  console.log('Using PostgreSQL connection (DATABASE_URL)');
   sequelize = new Sequelize(process.env.DATABASE_URL, {
     dialect: 'postgres',
     logging: false,
@@ -28,6 +33,11 @@ if (process.env.DATABASE_URL && process.env.DATABASE_URL.startsWith('postgres'))
     port: process.env.DB_PORT || 3306,
     url: process.env.MYSQL_URL
   };
+
+  // Diagnostic log for connection info (Safe: no password printed)
+  if (process.env.RENDER) {
+    console.log(`Render Environment: Attempting connection to ${dbConfig.host}:${dbConfig.port} as ${dbConfig.user} on DB ${dbConfig.database}`);
+  }
 
   if (dbConfig.url) {
     sequelize = new Sequelize(dbConfig.url, {
