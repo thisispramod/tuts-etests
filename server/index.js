@@ -11,8 +11,8 @@ const PORT = process.env.PORT || 5005;
 const SECRET_KEY = process.env.JWT_SECRET || 'super_secret_jwt_key_should_be_in_env'; // Fallback for dev only
 
 const allowedOrigins = [
-    'http://localhost:5173', // Vite default
-    'http://localhost:5174', // Vite default alternative
+    'https://tuts-e-test.vercel.app', // Vite default
+    'https://tuts-e-test.vercel.app/login', // Vite default alternative
     process.env.CLIENT_URL // Production URL
 ].filter(Boolean);
 
