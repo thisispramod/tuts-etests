@@ -12,9 +12,7 @@ const app = express();
 const PORT = process.env.PORT || 5005;
 const SECRET_KEY = process.env.JWT_SECRET || 'super_secret_jwt_key_should_be_in_env'; // Fallback for dev only
 
-const allowedOrigins = [
-    'http://localhost:5173',
-    'http://localhost:5174',
+const allowedOrigins = [ 
     'https://tuts-etests.vercel.app',
     process.env.CLIENT_URL
 ].filter(Boolean);
