@@ -1,10 +1,10 @@
 import axios from 'axios';
 
 const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const productionURL = 'https://tuts-etest.onrender.com/api';
+const productionURL = 'https://tuts-etests.onrender.com/api';
 
 const api = axios.create({
-    baseURL: !isLocalhost ? productionURL : (import.meta.env.VITE_API_URL || 'https://tuts-etest.onrender.com/api'),
+    baseURL: !isLocalhost ? productionURL : (import.meta.env.VITE_API_URL || 'https://tuts-etests.onrender.com/api'),
 });
 
 console.log('API baseURL selected:', api.defaults.baseURL, 'isLocalhost:', isLocalhost);

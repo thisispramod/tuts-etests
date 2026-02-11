@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'https://tuts-etest.onrender.com/api',
+    baseURL: import.meta.env.VITE_API_URL || 'https://tuts-etests.onrender.com/api',
 });
 
 // Auto-add token to requests
