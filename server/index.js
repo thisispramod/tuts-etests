@@ -1,7 +1,7 @@
 if (!process.env.RENDER) {
     require('dotenv').config();
 }
-const express = require('express');
+const express = require('express');  
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -11,25 +11,23 @@ const { Op } = require('sequelize');
 const app = express();
 const PORT = process.env.PORT || 5005;
 const SECRET_KEY = process.env.JWT_SECRET || 'super_secret_jwt_key_should_be_in_env'; // Fallback for dev only
-
-const allowedOrigins = [ 
-    'https://thisispramod-etests-app.vercel.app',
-    process.env.CLIENT_URL
-].filter(Boolean);
+const allowedOrigins = [
+  "https://thisispramod-etests-app.vercel.app",
+  "http://localhost:5173"
+];
 
 app.use(cors({
-    origin: function (origin, callback) {
-        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            console.log('CORS blocked for origin:', origin);
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      return callback(new Error("CORS not allowed"), false);
+    }
+    return callback(null, true);
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
-app.use(express.json());
-
 // Middleware to verify Token
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
