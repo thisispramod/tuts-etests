@@ -7,6 +7,8 @@ const api = axios.create({
     baseURL: !isLocalhost ? productionURL : (import.meta.env.VITE_API_URL || 'http://localhost:5005/api'),
 });
 
+console.log('API baseURL selected:', api.defaults.baseURL, 'isLocalhost:', isLocalhost);
+
 // Auto-add token to requests
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem('token');
