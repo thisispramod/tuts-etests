@@ -27,7 +27,7 @@ const Login = () => {
     return (
         <div className="flex items-center justify-center min-h-screen">
             <div className="glass-panel p-8 w-full max-w-md animate-fade-in" style={{ padding: '3rem' }}>
-                <h1 className="text-3xl font-bold text-center mb-2">Welcome Back</h1>
+                <h1 className="text-3xl font-bold text-center mb-2">Welcome Hi Back</h1>
                 <p className="text-center text-gray mb-8">Sign in to continue</p>
 
                 {error && <div className="p-3 mb-4 bg-red-500/20 text-red-200 rounded text-sm text-center">{error}</div>}
