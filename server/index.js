@@ -50,7 +50,9 @@ const isAdmin = (req, res, next) => {
 // --- AUTH ROUTES ---
 
 app.post('/api/login', async (req, res) => {
+    console.log(req.body);
     const { email, password } = req.body;
+
     try {
         const user = await User.findOne({ where: { email } });
         if (!user) return res.status(400).json({ message: 'User not found' });
