@@ -4,11 +4,14 @@ const isLocalhost = window.location.hostname === 'localhost' || window.location.
 const productionURL = 'https://tuts-etests.onrender.com/api';
 
 const api = axios.create({
-    baseURL: !isLocalhost ? productionURL : (import.meta.env.VITE_API_URL || 'https://tuts-etests.onrender.com/api'),
-    // baseURL: !isLocalhost ? productionURL : ('https://tuts-etests.onrender.com/api' || 'https://tuts-etests.onrender.com/api'),
+    // baseURL: !isLocalhost ? productionURL : (import.meta.env.VITE_API_URL || 'https://tuts-etests.onrender.com/api'), 
+    
 });
 
-console.log('API baseURL selected:', api.defaults.baseURL, 'isLocalhost:', isLocalhost);
+console.log({
+    'isLocalhost' : isLocalhost,
+    'VITE_API_URL': import.meta.env.VITE_API_URL,
+});
 
 // Auto-add token to requests
 api.interceptors.request.use((config) => {
