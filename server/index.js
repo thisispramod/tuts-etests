@@ -13,6 +13,7 @@ const PORT = process.env.PORT || 5005;
 const SECRET_KEY = process.env.JWT_SECRET || 'super_secret_jwt_key_should_be_in_env'; // Fallback for dev only
 const allowedOrigins = [
   "https://thisispramod-etests-app.vercel.app",
+  "https://tuts-etests.vercel.app",
   "http://localhost:5173"
 ];
 
